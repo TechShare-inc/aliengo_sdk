@@ -13,7 +13,14 @@ link_directories(lib)
 add_compile_options(-std=c++11)
 
 # Set extra libraries
-set(EXTRA_LIBS -pthread aliengo_comm lcm) 
+# Find LCM (ensure it's available on the system)
+find_library(LCM_LIB lcm PATHS /usr/lib/x86_64-linux-gnu /usr/local/lib REQUIRED)
+
+# Ensure the libaliengo_comm.so dependency is resolved
+find_library(ALIENGO_COMM_LIB aliengo_comm PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib REQUIRED)
+
+# Set extra libraries
+set(EXTRA_LIBS -pthread ${ALIENGO_COMM_LIB} ${LCM_LIB})
 # Note: If the library is named 'libaliengo_comm.so', just specifying 'aliengo_comm' (without prefix and suffix) is enough
 # as long as it is found in the linked directory.
 
