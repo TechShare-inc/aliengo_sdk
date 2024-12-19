@@ -12,17 +12,27 @@ link_directories(lib)
 # Add compile options
 add_compile_options(-std=c++11)
 
-# Set extra libraries
+# Detect the system architecture
+message(STATUS "Detecting system architecture...")
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+    set(LIBRARY_PATHS /usr/lib/x86_64-linux-gnu /usr/local/lib)
+elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+    set(LIBRARY_PATHS /usr/lib/aarch64-linux-gnu /usr/local/lib)
+else()
+    message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")
+endif()
+
 # Find LCM (ensure it's available on the system)
-find_library(LCM_LIB lcm PATHS /usr/lib/x86_64-linux-gnu /usr/local/lib REQUIRED)
+find_library(LCM_LIB lcm PATHS ${LIBRARY_PATHS} REQUIRED)
 
 # Ensure the libaliengo_comm.so dependency is resolved
-find_library(ALIENGO_COMM_LIB aliengo_comm PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib REQUIRED)
+find_library(ALIENGO_COMM_LIB aliengo_comm PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib ${LIBRARY_PATHS} REQUIRED)
 
 # Set extra libraries
 set(EXTRA_LIBS -pthread ${ALIENGO_COMM_LIB} ${LCM_LIB})
-# Note: If the library is named 'libaliengo_comm.so', just specifying 'aliengo_comm' (without prefix and suffix) is enough
-# as long as it is found in the linked directory.
+
+message(STATUS "LCM_LIB found at: ${LCM_LIB}")
+message(STATUS "ALIENGO_COMM_LIB found at: ${ALIENGO_COMM_LIB}")
 
 # Add executables
 add_executable(position_example examples/position_example.cpp)
