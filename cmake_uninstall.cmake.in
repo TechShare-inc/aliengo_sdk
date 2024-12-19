@@ -1,0 +1,7 @@
+# cmake_uninstall.cmake.in
+file(READ "${CMAKE_CURRENT_BINARY_DIR}/install_manifest.txt" files)
+string(REGEX REPLACE "\n" ";" files "${files}")
+foreach(file ${files})
+    message(STATUS "Removing ${file}")
+    execute_process(COMMAND "${CMAKE_COMMAND}" -E remove "${file}")
+endforeach()
