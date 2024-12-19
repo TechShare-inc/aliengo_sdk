@@ -7,7 +7,7 @@ link_directories(lib)
 
 add_compile_options(-std=c++11)
 
-set(EXTRA_LIBS -pthread libaliengo_comm.so lcm)
+set(EXTRA_LIBS -pthread libaliengo_comm_arm64.so lcm)
 
 # one pc one process
 add_executable(position_example examples/position_example.cpp)
