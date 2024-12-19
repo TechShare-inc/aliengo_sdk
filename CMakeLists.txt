@@ -16,8 +16,10 @@ add_compile_options(-std=c++11)
 message(STATUS "Detecting system architecture...")
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
     set(LIBRARY_PATHS /usr/lib/x86_64-linux-gnu /usr/local/lib)
+    set(ALIENGO_COMM_LIB_NAME "libaliengo_comm.so")
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
     set(LIBRARY_PATHS /usr/lib/aarch64-linux-gnu /usr/local/lib)
+    set(ALIENGO_COMM_LIB_NAME "libaliengo_comm_arm64.so")
 else()
     message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")
 endif()
@@ -25,8 +27,8 @@ endif()
 # Find LCM (ensure it's available on the system)
 find_library(LCM_LIB lcm PATHS ${LIBRARY_PATHS} REQUIRED)
 
-# Ensure the libaliengo_comm.so dependency is resolved
-find_library(ALIENGO_COMM_LIB aliengo_comm PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib ${LIBRARY_PATHS} REQUIRED)
+# Ensure the libaliengo_comm shared object dependency is resolved
+find_library(ALIENGO_COMM_LIB ${ALIENGO_COMM_LIB_NAME} PATHS ${CMAKE_CURRENT_SOURCE_DIR}/lib ${LIBRARY_PATHS} REQUIRED)
 
 # Set extra libraries
 set(EXTRA_LIBS -pthread ${ALIENGO_COMM_LIB} ${LCM_LIB})
@@ -75,9 +77,8 @@ install(TARGETS
 # Install the headers into include/
 install(DIRECTORY include/ DESTINATION include)
 
-# Install the shared library if it's part of this project
-# If libaliengo_comm.so is provided by you in the 'lib' directory, you can also install it.
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/lib/libaliengo_comm.so DESTINATION lib)
+# Install the correct shared library based on architecture
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/lib/${ALIENGO_COMM_LIB_NAME} DESTINATION lib)
 
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
